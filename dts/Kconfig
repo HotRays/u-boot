@@ -287,7 +287,7 @@ endmenu
 
 config MKIMAGE_DTC_PATH
 	string "Path to dtc binary for use within mkimage"
-	default "dtc"
+	default "scripts/dtc/dtc"
 	help
 	  The mkimage host tool will, in order to generate FIT images make
 	  calls to the dtc application in order to create the output.  In
