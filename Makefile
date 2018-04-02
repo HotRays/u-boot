@@ -242,6 +242,7 @@ export	HOSTARCH HOSTOS
 #########################################################################
 
 # set default to nothing for native builds
+CROSS_COMPILE ?= aarch64-linux-gnu-
 ifeq ($(HOSTARCH),$(ARCH))
 CROSS_COMPILE ?=
 endif
