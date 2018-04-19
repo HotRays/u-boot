@@ -363,7 +363,8 @@ dtb-$(CONFIG_MACH_SUN50I_H5) += \
 	sun50i-h5-orangepi-zero-plus2.dtb
 dtb-$(CONFIG_MACH_SUN50I_H6) += \
 	sun50i-h6-pine-h64.dtb \
-	sun50i-h6-tempe-h6v2.dtb
+	sun50i-h6-tempe-h6v2.dtb \
+	sun50i-h6-tempe-lite2.dtb
 dtb-$(CONFIG_MACH_SUN50I) += \
 	sun50i-a64-bananapi-m64.dtb \
 	sun50i-a64-nanopi-a64.dtb \
