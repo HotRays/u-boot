@@ -47,8 +47,8 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "Xunlong Orange Pi OnePlus";
-	compatible = "xunlong,orangepi-oneplus", "allwinner,sun50i-h6";
+	model = "TEMPE H6 V2";
+	compatible = "tempe,tempe-h6v2", "allwinner,sun50i-h6";
 
 	aliases {
 		serial0 = &uart0;
