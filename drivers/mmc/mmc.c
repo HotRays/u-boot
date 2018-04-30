@@ -471,6 +471,7 @@ ulong mmc_bread(struct blk_desc *block_dev, lbaint_t start, lbaint_t blkcnt,
 		blocks_todo -= cur;
 		start += cur;
 		dst += cur * mmc->read_bl_len;
+		if(blocks_todo > 0)puts(".");
 	} while (blocks_todo > 0);
 
 	return blkcnt;
