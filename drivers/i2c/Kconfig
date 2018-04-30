@@ -191,6 +191,15 @@ config SYS_I2C_ROCKCHIP
 	  have several I2C ports and all are provided, controled by the
 	  device tree.
 
+config SYS_I2C_SUNXI
+	bool "Allwinner I2C driver"
+	depends on DM
+	help
+	  Add support for the Allwinner I2C driver. This is used with various
+	  Allwinner parts such as RK3126, RK3128, RK3036 and RK3288. All chips
+	  have several I2C ports and all are provided, controled by the
+	  device tree.
+
 config SYS_I2C_SANDBOX
 	bool "Sandbox I2C driver"
 	depends on SANDBOX && DM_I2C

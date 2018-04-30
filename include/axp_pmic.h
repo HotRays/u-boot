@@ -19,6 +19,9 @@
 #ifdef CONFIG_AXP809_POWER
 #include <axp809.h>
 #endif
+#ifdef CONFIG_AXP806_POWER
+#include <axp806.h>
+#endif
 #ifdef CONFIG_AXP818_POWER
 #include <axp818.h>
 #endif

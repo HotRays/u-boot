@@ -92,3 +92,32 @@ unsigned int clock_get_pll6(void)
 	/* The register defines PLL6-4X, not plain PLL6 */
 	return 24000000 * n / div1 / div2 / 4;
 }
+
+int clock_twi_onoff(int port, int state)
+{
+	struct sunxi_ccm_reg *const ccm = 
+		(struct sunxi_ccm_reg *)SUNXI_CCM_BASE;
+
+	if(port == 5) {
+		/* R_TWI0 */
+		if(state) {
+			setbits_le32(SUNXI_RTWI0_BRG_REG, BIT(SUNXI_RTWI0_RST_BIT));
+			setbits_le32(SUNXI_RTWI0_BRG_REG, BIT(SUNXI_RTWI0_GATING_BIT));
+		} else {
+			clrbits_le32(SUNXI_RTWI0_BRG_REG, BIT(SUNXI_RTWI0_RST_BIT));
+			clrbits_le32(SUNXI_RTWI0_BRG_REG, BIT(SUNXI_RTWI0_GATING_BIT));
+		}
+		return 0;
+	}
+
+	/* set the apb clock gate and reset for twi */
+	if (state) {
+		setbits_le32(&ccm->twi_gate_reset, 1 << (RESET_SHIFT + port));
+		setbits_le32(&ccm->twi_gate_reset, 1 << (GATE_SHIFT + port));
+	} else {
+		clrbits_le32(&ccm->twi_gate_reset, 1 << (RESET_SHIFT + port));
+		clrbits_le32(&ccm->twi_gate_reset, 1 << (GATE_SHIFT + port));
+	}
+
+	return 0;
+}

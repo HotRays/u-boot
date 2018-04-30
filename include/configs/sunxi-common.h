@@ -229,14 +229,12 @@
     defined CONFIG_SY8106A_POWER
 #endif
 
-#if defined CONFIG_I2C0_ENABLE || defined CONFIG_I2C1_ENABLE || \
-    defined CONFIG_I2C2_ENABLE || defined CONFIG_I2C3_ENABLE || \
-    defined CONFIG_I2C4_ENABLE || defined CONFIG_R_I2C_ENABLE
-#define CONFIG_SYS_I2C_MVTWSI
+/* #define CONFIG_SYS_I2C_MVTWSI */
 #ifndef CONFIG_DM_I2C
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_SPEED		400000
-#define CONFIG_SYS_I2C_SLAVE		0x7f
+#ifdef CONFIG_AXP806_POWER
+#define CONFIG_SYS_I2C_SLAVE		0x36
 #endif
 #endif
 

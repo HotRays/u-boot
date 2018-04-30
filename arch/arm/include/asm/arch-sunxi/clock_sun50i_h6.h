@@ -293,6 +293,17 @@ struct sunxi_ccm_reg {
 
 /* Module gate/reset shift*/
 #define RESET_SHIFT			(16)
+#define GATE_SHIFT			(0)
+
+/* USB PHY's */
+#define CCM_USB_OTG_CLKL_REST 	(30) 	/* usb0_clk_cfg */
+#define CCM_USB_OTG_CLKL_GATE 	(29) 	/* usb0_clk_cfg */
+#define USB_OTG_GATE_OFFSET 	(8) 	/* usb_gate_reset */
+#define USB_OTG_REST_OFFSET 	(24) 	/* usb_gate_reset */
+
+/* EMAC */
+#define CCM_GATE_OFFSET_GMAC 	(0) /* emac_gate_reset */
+#define CCM_REST_OFFSET_GMAC 	(16)
 
 /* DRAM clock bit field */
 #define DRAM_MOD_RESET			BIT(30)
@@ -308,6 +319,7 @@ struct sunxi_ccm_reg {
 #define CCM_MMC_CTRL_PLL6X2		(0x1 << 24)
 #define CCM_MMC_CTRL_PLL_PERIPH2X2	(0x2 << 24)
 #define CCM_MMC_CTRL_ENABLE		(0x1 << 31)
+
 /* H6 doesn't have these delays */
 #define CCM_MMC_CTRL_OCLK_DLY(a)	((void) (a), 0)
 #define CCM_MMC_CTRL_SCLK_DLY(a)	((void) (a), 0)

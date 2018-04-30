@@ -50,6 +50,13 @@ config AXP809_POWER
 	---help---
 	Say y here to enable support for the axp809 pmic found on A80 boards.
 
+config AXP806_POWER
+	bool "axp806 pmic support"
+	depends on MACH_SUN50I_H6
+	select CMD_POWEROFF
+	---help---
+	Say y here to enable support for the axp806 pmic found on A80 boards.
+
 config AXP818_POWER
 	bool "axp818 pmic support"
 	depends on MACH_SUN8I_A83T

@@ -341,7 +341,7 @@ int stdio_add_devices(void)
 	}
 #endif
 #ifdef CONFIG_SYS_I2C
-	i2c_init_all();
+	// i2c_init_all();
 #else
 #endif
 #ifdef CONFIG_DM_VIDEO

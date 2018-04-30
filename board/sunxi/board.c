@@ -225,9 +225,8 @@ int board_init(void)
 	}
 #endif /* !CONFIG_ARM64 */
 
-	ret = axp_gpio_init();
-	if (ret)
-		return ret;
+	/* PMIC power on aldo2 */
+	axp_set_aldo2(3300);
 
 #ifdef CONFIG_SATAPWR
 	satapwr_pin = sunxi_name_to_gpio(CONFIG_SATAPWR);
@@ -543,6 +542,15 @@ int board_mmc_init(bd_t *bis)
 	return 0;
 }
 #endif
+
+void board_boot_order(u32 *spl_boot_list)
+{
+       spl_boot_list[0] = BOOT_DEVICE_RAM;
+       spl_boot_list[1] = BOOT_DEVICE_MMC1;
+       spl_boot_list[2] = BOOT_DEVICE_MMC2;
+       spl_boot_list[3] = BOOT_DEVICE_NOR;
+       spl_boot_list[4] = BOOT_DEVICE_USB;
+}
 
 #ifdef CONFIG_SPL_BUILD
 void sunxi_board_init(void)
