@@ -54,6 +54,7 @@
 #define MMC_VERSION_4_1		MAKE_MMC_VERSION(4, 1, 0)
 #define MMC_VERSION_4_2		MAKE_MMC_VERSION(4, 2, 0)
 #define MMC_VERSION_4_3		MAKE_MMC_VERSION(4, 3, 0)
+#define MMC_VERSION_4_4		MAKE_MMC_VERSION(4, 4, 0)
 #define MMC_VERSION_4_41	MAKE_MMC_VERSION(4, 4, 1)
 #define MMC_VERSION_4_5		MAKE_MMC_VERSION(4, 5, 0)
 #define MMC_VERSION_5_0		MAKE_MMC_VERSION(5, 0, 0)
@@ -789,7 +790,7 @@ int mmc_get_env_dev(void);
 
 /* Set block count limit because of 16 bit register limit on some hardware*/
 #ifndef CONFIG_SYS_MMC_MAX_BLK_COUNT
-#define CONFIG_SYS_MMC_MAX_BLK_COUNT 256
+#define CONFIG_SYS_MMC_MAX_BLK_COUNT 65536
 #endif
 
 /**

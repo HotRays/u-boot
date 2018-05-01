@@ -88,3 +88,11 @@
 &r_twi0 {
 	status = "okay";
 };
+
+&mmc0 {
+	status = "okay";
+};
+
+&mmc2 {
+	status = "okay";
+};

@@ -2016,11 +2016,11 @@ static int mmc_startup_v4(struct mmc *mmc)
 		MMC_VERSION_4_1,
 		MMC_VERSION_4_2,
 		MMC_VERSION_4_3,
+		MMC_VERSION_4_4,
 		MMC_VERSION_4_41,
 		MMC_VERSION_4_5,
 		MMC_VERSION_5_0,
 		MMC_VERSION_5_1,
-		MMC_VERSION_5_1
 	};
 
 	ALLOC_CACHE_ALIGN_BUFFER(u8, ext_csd, MMC_MAX_BLOCK_LEN);
@@ -2040,7 +2040,7 @@ static int mmc_startup_v4(struct mmc *mmc)
 		return -ENOMEM;
 	memcpy(mmc->ext_csd, ext_csd, MMC_MAX_BLOCK_LEN);
 
-	if (ext_csd[EXT_CSD_REV] > ARRAY_SIZE(mmc_versions))
+	if (ext_csd[EXT_CSD_REV] >= ARRAY_SIZE(mmc_versions))
 		return -EINVAL;
 
 	mmc->version = mmc_versions[ext_csd[EXT_CSD_REV]];
