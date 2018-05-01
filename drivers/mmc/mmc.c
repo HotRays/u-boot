@@ -26,6 +26,61 @@ static int mmc_set_signal_voltage(struct mmc *mmc, uint signal_voltage);
 static int mmc_power_cycle(struct mmc *mmc);
 static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps);
 
+void hexdump(const void *data, int size)
+{
+    /* dumps size bytes of *data to stdout. Looks like:
+     * [0000] 75 6E 6B 6E 6F 77 6E 20
+     *                  30 FF 00 00 00 00 39 00 unknown 0.....9.
+     * (in a single line of course)
+     */
+
+    const unsigned char *p = data;
+    unsigned char c;
+    int n;
+    char bytestr[4] = {0};
+    char addrstr[10] = {0};
+    char hexstr[ 16*3 + 5] = {0};
+    char charstr[16*1 + 5] = {0};
+    for(n=1;n<=size;n++) {
+        if (n%16 == 1) {
+            /* store address for this line */
+            snprintf(addrstr, sizeof(addrstr), "%04x",
+               (unsigned int)(p-(const unsigned char *)data));
+        }
+
+        c = *p;
+        if (c<'!' || c>'}') {
+            c = '.';
+        }
+
+        /* store hex str (for left side) */
+        snprintf(bytestr, sizeof(bytestr), "%02x ", *p);
+        strncat(hexstr, bytestr, sizeof(hexstr)-strlen(hexstr)-1);
+
+        /* store char str (for right side) */
+        snprintf(bytestr, sizeof(bytestr), "%c", c);
+        strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
+
+        if(n%16 == 0) {
+            /* line completed */
+            printf("[%4s]   %50s  %s\n", addrstr, hexstr, charstr);
+            hexstr[0] = 0;
+            charstr[0] = 0;
+        } else if(n%8 == 0) {
+            /* half line: add whitespaces */
+            strncat(hexstr, "  ", sizeof(hexstr)-strlen(hexstr)-1);
+            strncat(charstr, " ", sizeof(charstr)-strlen(charstr)-1);
+        }
+        p++; /* next byte */
+    }
+
+    if (strlen(hexstr) > 0) {
+        /* print rest of buffer if not empty */
+        printf("[%4s]   %50s  %s\n", addrstr, hexstr, charstr);
+    }
+}
+
+
 #if CONFIG_IS_ENABLED(MMC_TINY)
 static struct mmc mmc_static;
 struct mmc *find_mmc_device(int dev_num)
@@ -430,7 +485,7 @@ ulong mmc_bread(struct blk_desc *block_dev, lbaint_t start, lbaint_t blkcnt,
 	struct blk_desc *block_dev = dev_get_uclass_platdata(dev);
 #endif
 	int dev_num = block_dev->devnum;
-	int err;
+	int err, count;
 	lbaint_t cur, blocks_todo = blkcnt;
 
 	if (blkcnt == 0)
@@ -461,18 +516,28 @@ ulong mmc_bread(struct blk_desc *block_dev, lbaint_t start, lbaint_t blkcnt,
 		return 0;
 	}
 
+	count = 0;
 	do {
-		cur = (blocks_todo > mmc->cfg->b_max) ?
-			mmc->cfg->b_max : blocks_todo;
+		lbaint_t pstart;
+		cur = ((blocks_todo > mmc->cfg->b_max) ? mmc->cfg->b_max : blocks_todo);
 		if (mmc_read_blocks(mmc, dst, start, cur) != cur) {
-			debug("%s: Failed to read blocks\n", __func__);
+			printf("%s: Failed to read blocks %d\n", __func__, (unsigned int)cur);
 			return 0;
 		}
+		pstart = start;
 		blocks_todo -= cur;
 		start += cur;
 		dst += cur * mmc->read_bl_len;
-		if(blocks_todo > 0)puts(".");
+		if(blocks_todo > 0) {
+			printf(" %d", count++);
+			if(count % 16 == 0)puts("\n");
+			if(count == 1) {
+				printf("\n\tstart: %x\n", (unsigned int)pstart);
+				hexdump(dst, 96);
+			}
+		}
 	} while (blocks_todo > 0);
+	if(count)puts(" -\n");
 
 	return blkcnt;
 }
@@ -1954,6 +2019,7 @@ static int mmc_startup_v4(struct mmc *mmc)
 		MMC_VERSION_4_41,
 		MMC_VERSION_4_5,
 		MMC_VERSION_5_0,
+		MMC_VERSION_5_1,
 		MMC_VERSION_5_1
 	};
 
@@ -2198,6 +2264,7 @@ static int mmc_startup(struct mmc *mmc)
 	mmc->csd[1] = cmd.response[1];
 	mmc->csd[2] = cmd.response[2];
 	mmc->csd[3] = cmd.response[3];
+
 
 	if (mmc->version == MMC_VERSION_UNKNOWN) {
 		int version = (cmd.response[0] >> 26) & 0xf;

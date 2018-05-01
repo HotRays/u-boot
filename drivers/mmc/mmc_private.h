@@ -12,6 +12,8 @@
 
 #include <mmc.h>
 
+extern void hexdump(const void *data, int size);
+
 extern int mmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 			struct mmc_data *data);
 extern int mmc_send_status(struct mmc *mmc, int timeout);
