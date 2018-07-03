@@ -325,7 +325,7 @@ static void mctl_set_addrmap(struct dram_para *para)
 	if (ranks == 2)
 		mctl_ctl->addrmap[0] = rows + cols - 3;
 	else
-		mctl_ctl->addrmap[0] = 0x0F;
+		mctl_ctl->addrmap[0] = 0x1F;
 
 	/* Banks, hardcoded to 8 banks now */
 	mctl_ctl->addrmap[1] = (cols - 2) | (cols - 2) << 8 | (cols - 2) << 16;
@@ -610,6 +610,26 @@ static void mctl_channel_init(struct dram_para *para)
 		clrbits_le32(&mctl_phy->dx[i].gcr[3], ~0x3ffff);
 	udelay(10);
 
+	if (readl(&mctl_phy->pgsr[0]) & 0x400000)
+	{
+		/*
+		 * Detect single rank.
+		 * TODO: also detect half DQ.
+		 */
+		if ((readl(&mctl_phy->dx[0].rsr[0]) & 0x3) == 2 &&
+		    (readl(&mctl_phy->dx[1].rsr[0]) & 0x3) == 2 &&
+		    (readl(&mctl_phy->dx[2].rsr[0]) & 0x3) == 2 &&
+		    (readl(&mctl_phy->dx[3].rsr[0]) & 0x3) == 2) {
+			para->ranks = 1;
+			/* Restart DRAM initialization from scratch. */
+			mctl_core_init(para);
+			return;
+		}
+		else {
+			panic("This DRAM setup is currently not supported.\n");
+		}
+	}
+
 	if (readl(&mctl_phy->pgsr[0]) & 0xff00000) {
 		/* Oops! There's something wrong! */
 		debug("PLL = %x\n", readl(0x3001010));
@@ -702,7 +722,7 @@ unsigned long long sunxi_dram_init(void)
 
 	size = mctl_calc_size(&para);
 
-	clrsetbits_le32(&mctl_com->cr, 0xf0, (size / 1024 / 1024) & 0xf0);
+	clrsetbits_le32(&mctl_com->cr, 0xf0, (size >> (10 + 10 + 4)) & 0xf0);
 
 	mctl_set_master_priority();
 
