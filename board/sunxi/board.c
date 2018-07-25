@@ -862,42 +862,36 @@ int board_late_init(void)
 	
     int node_red,node_blue,node_green;
 
-    node_red = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledred");  
+    node_red = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledred");
     if (node_red < 0)
-    {   
+    {
         printf("Don't find red-gpio,test node\n");
-        return -1; 
-    }   
+        return -1;
+    }
     gpio_request_by_name_nodev(offset_to_ofnode(node_red), "led-red", 0, &red_led, GPIOD_IS_OUT);
 
-
-    node_blue = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledblue");  
+    node_blue = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledblue"); 
     if (node_blue < 0)
-    {   
+    {
         printf("Don't find blue-gpio,test node\n");
-        return -1; 
-    }   
+        return -1;
+    }
     gpio_request_by_name_nodev(offset_to_ofnode(node_blue), "led-blue", 0, &blue_led, GPIOD_IS_OUT);
 
-
-    node_green = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledgreen");  
+    node_green = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledgreen");
     if (node_green < 0)
-    {   
+    {
         printf("Don't find green-gpio,test node\n");
-        return -1; 
-    }   
-    gpio_request_by_name_nodev(offset_to_ofnode(node_green), "led-green", 0, &green_led, GPIOD_IS_OUT);	
-
-
+        return -1;
+    }
+    gpio_request_by_name_nodev(offset_to_ofnode(node_green), "led-green", 0, &green_led, GPIOD_IS_OUT);
 
    if (dm_gpio_is_valid(&red_led) && dm_gpio_is_valid(&blue_led) && dm_gpio_is_valid(&green_led))// 判断对应gpio_desc是否可用
     {   
         printf("Get gpio\n");
-
-            // dm_gpio_set_value(&red_led, 1);  
-            // dm_gpio_set_value(&blue_led, 1);  
-            dm_gpio_set_value(&green_led, 1);  
-
+            // dm_gpio_set_value(&red_led, 1);
+            // dm_gpio_set_value(&blue_led, 1);
+            dm_gpio_set_value(&green_led, 1);
     }
     else
     {
