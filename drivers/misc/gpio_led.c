@@ -10,7 +10,7 @@
 #include <asm/gpio.h>
 
 #ifndef CONFIG_GPIO_LED_INVERTED_TABLE
-#define CONFIG_GPIO_LED_INVERTED_TABLE {}
+#define CONFIG_GPIO_LED_INVERTED_TABLE {385,386,387}
 #endif
 
 static led_id_t gpio_led_inv[] = CONFIG_GPIO_LED_INVERTED_TABLE;

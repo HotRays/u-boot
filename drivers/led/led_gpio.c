@@ -64,8 +64,12 @@ static int led_gpio_probe(struct udevice *dev)
 	/* Ignore the top-level LED node */
 	if (!uc_plat->label)
 		return 0;
-	return gpio_request_by_name(dev, "gpios", 0, &priv->gpio, GPIOD_IS_OUT);
+	int err;
+	err = gpio_request_by_name(dev, "gpios", 0, &priv->gpio, GPIOD_IS_OUT);
+	printf("led_gpio err = %d",err);
+	gpio_led_set_state(&priv->gpio,LEDST_ON);
 }
+
 
 static int led_gpio_remove(struct udevice *dev)
 {

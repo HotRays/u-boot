@@ -61,8 +61,6 @@
 
 	leds {
 		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&led_pins>;
 
 		lte-4g {
 			label = "lte-4g";
@@ -73,9 +71,24 @@
 			label = "status";
 			gpios = <&pio 3 1 GPIO_ACTIVE_LOW>; /* PD1 */
 		};
+
+	};
+
+	led1 {
+		compatible = "st,ledred";
+		led-red = <&r_pio 1 0 GPIO_ACTIVE_LOW>;
+	};
+
+	led2 {
+		compatible = "st,ledblue";
+		led-blue = <&r_pio 1 1 GPIO_ACTIVE_LOW>;
+	};
+
+	led3 {
+		compatible = "st,ledgreen";
+		led-green = <&r_pio 1 2 GPIO_ACTIVE_LOW>;
 	};
 };
-
 &uart0 {
 	status = "okay";
 };

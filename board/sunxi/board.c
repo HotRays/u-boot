@@ -35,7 +35,7 @@
 #include <spl.h>
 #include <sy8106a.h>
 #include <asm/setup.h>
-
+#include <status_led.h>
 #if defined CONFIG_VIDEO_LCD_PANEL_I2C && !(defined CONFIG_SPL_BUILD)
 /* So that we can use pin names in Kconfig and sunxi_name_to_gpio() */
 int soft_i2c_gpio_sda;
@@ -227,7 +227,18 @@ int board_init(void)
 
 	/* PMIC power on aldo2 */
 	axp_set_aldo2(3300);
-
+ 	board_late_init();
+/*
+	int err = 0 ;
+	err = gpio_direction_output(320,0);
+	printf("320 0,err = %d\n", err);
+	err = 0;
+  	err = gpio_direction_output(321,1);
+	printf("321 0,err = %d\n", err);
+ 	err = 0;
+	err = gpio_set_value(322,0);
+	printf("322 0,err = %d\n", err);
+*/
 #ifdef CONFIG_SATAPWR
 	satapwr_pin = sunxi_name_to_gpio(CONFIG_SATAPWR);
 	gpio_request(satapwr_pin, "satapwr");
@@ -851,3 +862,72 @@ int board_fit_config_name_match(const char *name)
 	}
 }
 #endif
+
+
+int board_late_init(void)
+{
+    struct gpio_desc red_led = {};
+    struct gpio_desc blue_led = {};
+    struct gpio_desc green_led = {};
+	
+    int node_red,node_blue,node_green;
+
+    node_red = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledred");  
+    if (node_red < 0)
+    {   
+        printf("Don't find red-gpio,test node\n");
+        return -1; 
+    }   
+    gpio_request_by_name_nodev(offset_to_ofnode(node_red), "led-red", 0, &red_led, GPIOD_IS_OUT);
+
+
+    node_blue = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledblue");  
+    if (node_blue < 0)
+    {   
+        printf("Don't find blue-gpio,test node\n");
+        return -1; 
+    }   
+    gpio_request_by_name_nodev(offset_to_ofnode(node_blue), "led-blue", 0, &blue_led, GPIOD_IS_OUT);
+
+
+    node_green = fdt_node_offset_by_compatible(gd->fdt_blob, 0, "st,ledgreen");  
+    if (node_green < 0)
+    {   
+        printf("Don't find green-gpio,test node\n");
+        return -1; 
+    }   
+    gpio_request_by_name_nodev(offset_to_ofnode(node_green), "led-green", 0, &green_led, GPIOD_IS_OUT);	
+
+
+
+   if (dm_gpio_is_valid(&red_led) && dm_gpio_is_valid(&blue_led) && dm_gpio_is_valid(&green_led))// 判断对应gpio_desc是否可用
+    {   
+        printf("Get gpio\n");
+        // while(1) 
+        // {   
+            // dm_gpio_set_value(&red_led, 1);  
+            // dm_gpio_set_value(&blue_led, 0);  
+            // dm_gpio_set_value(&green_led, 0);  
+
+            // mdelay(1000);
+            // dm_gpio_set_value(&red_led, 0);  
+            // dm_gpio_set_value(&blue_led, 1); 
+            // dm_gpio_set_value(&green_led, 0);  
+
+            // mdelay(1000); 
+
+            // dm_gpio_set_value(&red_led, 0);  
+            // dm_gpio_set_value(&blue_led, 0);  
+            dm_gpio_set_value(&green_led, 1);  
+
+            // mdelay(1000);   			
+		// }
+    }
+    else
+    {
+        printf("Can't get gpio\n");
+    }
+
+	return 0;
+}
+
