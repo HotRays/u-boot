@@ -228,17 +228,7 @@ int board_init(void)
 	/* PMIC power on aldo2 */
 	axp_set_aldo2(3300);
  	board_late_init();
-/*
-	int err = 0 ;
-	err = gpio_direction_output(320,0);
-	printf("320 0,err = %d\n", err);
-	err = 0;
-  	err = gpio_direction_output(321,1);
-	printf("321 0,err = %d\n", err);
- 	err = 0;
-	err = gpio_set_value(322,0);
-	printf("322 0,err = %d\n", err);
-*/
+
 #ifdef CONFIG_SATAPWR
 	satapwr_pin = sunxi_name_to_gpio(CONFIG_SATAPWR);
 	gpio_request(satapwr_pin, "satapwr");
@@ -903,25 +893,11 @@ int board_late_init(void)
    if (dm_gpio_is_valid(&red_led) && dm_gpio_is_valid(&blue_led) && dm_gpio_is_valid(&green_led))// 判断对应gpio_desc是否可用
     {   
         printf("Get gpio\n");
-        // while(1) 
-        // {   
+
             // dm_gpio_set_value(&red_led, 1);  
-            // dm_gpio_set_value(&blue_led, 0);  
-            // dm_gpio_set_value(&green_led, 0);  
-
-            // mdelay(1000);
-            // dm_gpio_set_value(&red_led, 0);  
-            // dm_gpio_set_value(&blue_led, 1); 
-            // dm_gpio_set_value(&green_led, 0);  
-
-            // mdelay(1000); 
-
-            // dm_gpio_set_value(&red_led, 0);  
-            // dm_gpio_set_value(&blue_led, 0);  
+            // dm_gpio_set_value(&blue_led, 1);  
             dm_gpio_set_value(&green_led, 1);  
 
-            // mdelay(1000);   			
-		// }
     }
     else
     {
