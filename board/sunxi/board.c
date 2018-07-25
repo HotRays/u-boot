@@ -889,8 +889,8 @@ int board_late_init(void)
    if (dm_gpio_is_valid(&red_led) && dm_gpio_is_valid(&blue_led) && dm_gpio_is_valid(&green_led))// 判断对应gpio_desc是否可用
     {   
         printf("Get gpio\n");
-            // dm_gpio_set_value(&red_led, 1);
-            // dm_gpio_set_value(&blue_led, 1);
+            /* dm_gpio_set_value(&red_led, 1);*/
+            /* dm_gpio_set_value(&blue_led, 1);*/
             dm_gpio_set_value(&green_led, 1);
     }
     else
