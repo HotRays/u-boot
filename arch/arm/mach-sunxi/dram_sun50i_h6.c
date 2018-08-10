@@ -13,7 +13,24 @@
 #include <linux/bitops.h>
 #include <linux/kconfig.h>
 
-#define SZ_3G (3UL * 1024 * 1024 * 1024)
+/*
+ * The DRAM controller structure on H6 is similar to the ones on A23/A80:
+ * they all contains 3 parts, COM, CTL and PHY. (As a note on A33/A83T/H3/A64
+ * /H5/R40 CTL and PHY is composed).
+ *
+ * COM is allwinner-specific. On H6, the address mapping function is moved
+ * from COM to CTL (with the standard ADDRMAP registers on DesignWare memory
+ * controller).
+ *
+ * CTL (controller) and PHY is from DesignWare.
+ *
+ * The CTL part is a bit similar to the one on A23/A80 (because they all
+ * originate from DesignWare), but gets more registers added.
+ *
+ * The PHY part is quite new, not seen in any previous Allwinner SoCs, and
+ * not seen on other SoCs in U-Boot. The only SoC that is also known to have
+ * similar PHY is ZynqMP.
+ */
 
 /*
  * The delay parameters below allow to allegedly specify delay times of some
@@ -282,6 +299,8 @@ static void mctl_sys_init(struct dram_para *para)
 
 	/* Put all DRAM-related blocks to reset state */
 	clrbits_le32(&ccm->mbus_cfg, MBUS_ENABLE | MBUS_RESET);
+	clrbits_le32(&ccm->dram_gate_reset, BIT(0));
+	udelay(5);
 	writel(0, &ccm->dram_gate_reset);
 	clrbits_le32(&ccm->pll5_cfg, CCM_PLL5_CTRL_EN);
 	clrbits_le32(&ccm->dram_clk_cfg, DRAM_MOD_RESET);
@@ -296,7 +315,9 @@ static void mctl_sys_init(struct dram_para *para)
 	/* Configure DRAM mod clock */
 	writel(DRAM_CLK_SRC_PLL5, &ccm->dram_clk_cfg);
 	setbits_le32(&ccm->dram_clk_cfg, DRAM_CLK_UPDATE);
-	writel(BIT(0) | BIT(RESET_SHIFT), &ccm->dram_gate_reset);
+	writel(BIT(RESET_SHIFT), &ccm->dram_gate_reset);
+	udelay(5);
+	setbits_le32(&ccm->dram_gate_reset, BIT(0));
 
 	/* Disable all channels */
 	writel(0, &mctl_com->maer0);
@@ -581,7 +602,9 @@ static void mctl_channel_init(struct dram_para *para)
 	}
 
 	/* TODO: non-LPDDR3 types */
-	mctl_phy_pir_init(0xf562 | BIT(10));
+	mctl_phy_pir_init(PIR_ZCAL | PIR_DCAL | PIR_PHYRST | PIR_DRAMINIT |
+			  PIR_QSGATE | PIR_RDDSKW | PIR_WRDSKW | PIR_RDEYE |
+			  PIR_WREYE);
 
 	/* TODO: non-LPDDR3 types */
 	for (i = 0; i < 4; i++)
@@ -655,6 +678,12 @@ static void mctl_channel_init(struct dram_para *para)
 static void mctl_auto_detect_dram_size(struct dram_para *para)
 {
 	/* TODO: non-LPDDR3, half DQ */
+	/*
+	 * Detect rank number by the code in mctl_channel_init. Furtherly
+	 * when DQ detection is available it will also be executed there.
+	 */
+	mctl_core_init(para);
+
 	/* detect row address bits */
 	para->cols = 8;
 	para->rows = 18;
@@ -677,7 +706,7 @@ static void mctl_auto_detect_dram_size(struct dram_para *para)
 	}
 }
 
-unsigned long long mctl_calc_size(struct dram_para *para)
+unsigned long mctl_calc_size(struct dram_para *para)
 {
 	/* TODO: non-LPDDR3, half DQ */
 
@@ -696,7 +725,7 @@ unsigned long long mctl_calc_size(struct dram_para *para)
 	 {  4,  4,  4,  4,  4,  4,  4,  4,  4,  0,  0,  0,  0,  0 },	\
 	 {  4,  4,  4,  4,  4,  4,  4,  4,  4,  0,  0,  0,  0,  0 }}
 
-unsigned long long sunxi_dram_init(void)
+unsigned long sunxi_dram_init(void)
 {
 	struct sunxi_mctl_com_reg * const mctl_com =
 			(struct sunxi_mctl_com_reg *)SUNXI_DRAM_COM_BASE;
@@ -710,7 +739,7 @@ unsigned long long sunxi_dram_init(void)
 		.dx_write_delays = SUN50I_H6_DX_WRITE_DELAYS,
 	};
 
-	unsigned long long size;
+	unsigned long size;
 
 	/* RES_CAL_CTRL_REG in BSP U-boot*/
 	setbits_le32(0x7010310, BIT(8));
