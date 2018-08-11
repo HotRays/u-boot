@@ -248,8 +248,7 @@ static int __abortboot(int bootdelay)
 	printf("Hit any key to stop autoboot: %2d ", bootdelay);
 #endif
 	/* wait pmic key value & emergency boot */
-	abort = axp_key();
-	if(abort) {
+	if(axp_key()) {
 		env_set("bootargs", "earlyprintk " \
 						"console=ttyS0,115200 " \
 						"root=/dev/ram0 " \
