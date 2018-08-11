@@ -13,6 +13,8 @@
 #include <fdtdec.h>
 #include <menu.h>
 #include <post.h>
+#include <asm/gpio.h>
+#include <led.h>
 #include <u-boot/sha256.h>
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -208,16 +210,59 @@ static int __abortboot(int bootdelay)
 static int menukey;
 #endif
 
+static void leds_blink(int sec)
+{
+	struct udevice *dev;
+	int status = led_get_by_label("Status", &dev);
+
+	if(status) {
+		printf("LED Blink request DEV failed: %d\n", status);
+		return;
+	}
+
+	if(!sec) {
+		/* turn off */
+		led_set_state(dev, LEDST_OFF);
+		return;
+	}
+
+	led_set_state(dev, LEDST_ON);
+	while(sec--) {
+		mdelay(500);
+		led_set_state(dev, LEDST_OFF);
+		mdelay(500);
+		led_set_state(dev, LEDST_ON);
+	}
+}
+
 static int __abortboot(int bootdelay)
 {
 	int abort = 0;
 	unsigned long ts;
+
+	leds_blink(3);
 
 #ifdef CONFIG_MENUPROMPT
 	printf(CONFIG_MENUPROMPT);
 #else
 	printf("Hit any key to stop autoboot: %2d ", bootdelay);
 #endif
+	/* wait pmic key value & emergency boot */
+	abort = axp_key();
+	if(abort) {
+		env_set("bootargs", "earlyprintk " \
+						"console=ttyS0,115200 " \
+						"root=/dev/ram0 " \
+						"init=/init " \
+						"rootwait");
+		env_set("bootcmd_emergency", "mmc dev 1 && " \
+						"mmc read ${fdt_addr_r} 0x800 0x20 && " \
+						"mmc read ${kernel_addr_r} 0x1000 0xd000 && " \
+						"booti ${kernel_addr_r} - ${fdt_addr_r};");
+	} else {
+		/* normal boot */
+		leds_blink(0);
+	}
 
 	/*
 	 * Check if key already pressed

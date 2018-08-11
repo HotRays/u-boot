@@ -61,17 +61,25 @@
 
 	leds {
 		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&led_pins>;
 
-		lte-4g {
-			label = "lte-4g";
-			gpios = <&pio 3 0 GPIO_ACTIVE_LOW>; /* PD0 */
+		RJ45 {
+			label = "RJ45";
+			gpios = <&pio 3 15 GPIO_ACTIVE_LOW>; /* PD15 */
 		};
 
-		status {
-			label = "status";
-			gpios = <&pio 3 1 GPIO_ACTIVE_LOW>; /* PD1 */
+		WiFi {
+			label = "WiFi";
+			gpios = <&pio 3 18 GPIO_ACTIVE_LOW>; /* PD18 */
+		};
+
+		LTE {
+			label = "LTE";
+			gpios = <&pio 3 17 GPIO_ACTIVE_LOW>; /* PD17 */
+		};
+
+		Status {
+			label = "Status";
+			gpios = <&pio 3 16 GPIO_ACTIVE_LOW>; /* PD16 */
 		};
 	};
 };

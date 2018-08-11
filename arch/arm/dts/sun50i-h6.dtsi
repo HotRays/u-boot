@@ -262,13 +262,6 @@
 				allwinner,drive = <10>;
 				allwinner,pull = <0>;
 			};
-
-			led_pins: led_pin@0 {
-				allwinner,pins = "PL4", "PL7";
-				allwinner,function = "gpio_out";
-				allwinner,drive = <10>;
-				allwinner,pull = <2>;
-			};
 		};
 
 		r_twi0: i2c@07081400 {

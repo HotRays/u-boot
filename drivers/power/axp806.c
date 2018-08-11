@@ -50,7 +50,7 @@ static int axp806_set_aldo2(int set_vol, int onoff)
 		printf("sunxi pmu error : unable to onoff aldo2\n");
 		return -1;
 	}
-	printf("%s: %d, ok\n", __func__, set_vol);
+	printf("AXP806: Set ALDO2 %d, OK\n", set_vol);
 	return 0;
 }
 
@@ -79,10 +79,14 @@ int axp_init(void)
 		return -EINVAL;
 
 	/* Mask all interrupts */
-	for (i = AXP806_IRQ_ENABLE1; i <= AXP806_IRQ_ENABLE2; i++) {
-		rc = pmic_bus_write(i, 0);
-		if (rc)
-			return rc;
+	rc = pmic_bus_write(AXP806_IRQ_ENABLE1, 0);
+	if (rc)
+		return rc;
+
+	rc = pmic_bus_write(AXP806_IRQ_ENABLE2, 0x03);
+	if (rc) {
+		printf("AXP806: enable irq failed\n");
+		return rc;
 	}
 
 	/*
@@ -102,6 +106,23 @@ int axp_init(void)
 		return rc;
 
 	return 0;
+}
+
+int axp_key(void)
+{
+	u8 value;
+	int rc = 0;
+
+	rc = pmic_bus_read(AXP806_IRQ_STS2, &value);
+	if(rc) {
+		printf("AXP806: int status2 error\n");
+		return 0;
+	}
+	if(value) {
+		printf("\nAXP806: power key2: %x\n", value);
+	}
+
+	return value;
 }
 
 // int do_poweroff(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
