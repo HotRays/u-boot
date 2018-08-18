@@ -210,19 +210,25 @@ static int __abortboot(int bootdelay)
 static int menukey;
 #endif
 
-static void leds_blink(int sec)
+static void status_blink(int sec)
 {
 	struct udevice *dev;
-	int status = led_get_by_label("Status", &dev);
+	int res = led_get_by_label("Status", &dev);
 
-	if(status) {
-		printf("LED Blink request DEV failed: %d\n", status);
+	if(res) {
+		printf("LED Blink request [Status] failed: %d\n", res);
 		return;
 	}
 
 	if(!sec) {
-		/* turn off */
+		/* turn off Status, turn on LTE */
 		led_set_state(dev, LEDST_OFF);
+		res = led_get_by_label("WiFi", &dev);
+		if(res) {
+			printf("LED Blink req LTE failed: %d\n", res);
+			return;
+		}
+		led_set_state(dev, LEDST_ON);
 		return;
 	}
 
@@ -240,7 +246,7 @@ static int __abortboot(int bootdelay)
 	int abort = 0;
 	unsigned long ts;
 
-	leds_blink(3);
+	status_blink(3);
 
 #ifdef CONFIG_MENUPROMPT
 	printf(CONFIG_MENUPROMPT);
@@ -260,7 +266,7 @@ static int __abortboot(int bootdelay)
 						"booti ${kernel_addr_r} - ${fdt_addr_r};");
 	} else {
 		/* normal boot */
-		leds_blink(0);
+		status_blink(0);
 	}
 
 	/*
