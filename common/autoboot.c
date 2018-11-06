@@ -261,7 +261,7 @@ static int __abortboot(int bootdelay)
 						"init=/init " \
 						"rootwait");
 		env_set("bootcmd_emergency", "mmc dev 1 && " \
-						"mmc read ${fdt_addr_r} 0x800 0x20 && " \
+						"mmc read ${fdt_addr_r} 0x800 0x80 && " \
 						"mmc read ${kernel_addr_r} 0x1000 0xd000 && " \
 						"booti ${kernel_addr_r} - ${fdt_addr_r};");
 	} else {
